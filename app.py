@@ -26,7 +26,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 
 # =========================================================
-# DATOS SEED (valores iniciales)
+# SEEDS
 # =========================================================
 def seed_productos():
     return pd.DataFrame([
@@ -123,7 +123,7 @@ def seed_prediccion():
 
 
 # =========================================================
-# PERSISTENCIA CSV
+# PERSISTENCIA
 # =========================================================
 def _path(nombre):
     return os.path.join(DATA_DIR, f"{nombre}.csv")
@@ -183,7 +183,7 @@ def resetear_todo():
 
 
 # =========================================================
-# LÓGICA DE CÁLCULOS
+# CÁLCULOS
 # =========================================================
 def enriquecer_ventas(df_ventas, df_productos):
     if df_ventas.empty:
@@ -288,7 +288,7 @@ def estado_resultados(ingresos, unidades, cvu, cf):
 
 
 # =========================================================
-# IMPORTADOR CSV/EXCEL
+# IMPORTADOR
 # =========================================================
 ESQUEMAS = {
     "productos": ["codigo", "producto", "categoria", "precio", "costo"],
@@ -387,11 +387,11 @@ if st.sidebar.button("♻️ Restaurar datos de ejemplo", use_container_width=Tr
     st.sidebar.success("Datos restaurados.")
     st.rerun()
 
-st.sidebar.caption("v1.1 · Datos en memoria + CSV local")
+st.sidebar.caption("v1.2 · Datos en memoria + CSV local")
 
 
 # ---------------------------------------------------------
-# DASHBOARD
+# 📊 DASHBOARD
 # ---------------------------------------------------------
 if menu == "📊 Dashboard":
     st.title("📊 Dashboard Ejecutivo")
@@ -405,8 +405,7 @@ if menu == "📊 Dashboard":
     c1.metric("🛒 Unidades vendidas", f"{res['unidades']:,}")
     c2.metric("💵 Ingresos", f"Bs {res['ingresos']:,.2f}")
     c3.metric("💸 Costos variables", f"Bs {res['costos']:,.2f}")
-    c4.metric("📈 Utilidad bruta", f"Bs {res['utilidad']:,.2f}",
-              f"{res['margen']*100:.1f}%")
+    c4.metric("📈 Utilidad bruta", f"Bs {res['utilidad']:,.2f}", f"{res['margen']*100:.1f}%")
 
     st.markdown("---")
     df_pred = predecir_ventas(st.session_state.df_prediccion)
@@ -416,10 +415,8 @@ if menu == "📊 Dashboard":
     c5, c6, c7, c8 = st.columns(4)
     c5.metric("🏠 Costos fijos/mes", f"Bs {cf:,.2f}")
     c6.metric("📦 Costo variable unit.", f"Bs {cvu:,.2f}")
-    c7.metric("⚖️ PE (unidades)", f"{pe['pe_unidades']:.0f} copas"
-              if pe['pe_unidades'] != float('inf') else "∞")
-    c8.metric("💰 PE (Bs)", f"Bs {pe['pe_ingresos']:,.0f}"
-              if pe['pe_ingresos'] != float('inf') else "∞")
+    c7.metric("⚖️ PE (unidades)", f"{pe['pe_unidades']:.0f} copas" if pe['pe_unidades'] != float('inf') else "∞")
+    c8.metric("💰 PE (Bs)", f"Bs {pe['pe_ingresos']:,.0f}" if pe['pe_ingresos'] != float('inf') else "∞")
 
     st.markdown("---")
     col_a, col_b = st.columns(2)
@@ -429,8 +426,7 @@ if menu == "📊 Dashboard":
         top = ranking_productos(df_enr, st.session_state.df_productos)
         if not top.empty:
             fig = px.bar(top, x="ingresos", y="producto", orientation="h",
-                         color="utilidad", text="unidades",
-                         color_continuous_scale="Teal")
+                         color="utilidad", text="unidades", color_continuous_scale="Teal")
             fig.update_layout(height=350, showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
         else:
@@ -448,7 +444,7 @@ if menu == "📊 Dashboard":
 
 
 # ---------------------------------------------------------
-# VENTAS
+# 🛒 VENTAS
 # ---------------------------------------------------------
 elif menu == "🛒 Ventas":
     st.title("🛒 Registro de Ventas")
@@ -456,8 +452,7 @@ elif menu == "🛒 Ventas":
     with st.form("nueva_venta", clear_on_submit=True):
         col1, col2, col3 = st.columns([2, 2, 1])
         fecha = col1.date_input("Fecha", value=date.today())
-        producto = col2.selectbox("Producto",
-                                  st.session_state.df_productos["producto"].tolist())
+        producto = col2.selectbox("Producto", st.session_state.df_productos["producto"].tolist())
         cantidad = col3.number_input("Cantidad", min_value=1, value=1, step=1)
         if st.form_submit_button("➕ Agregar venta", use_container_width=True):
             n = len(st.session_state.df_ventas) + 1
@@ -465,16 +460,14 @@ elif menu == "🛒 Ventas":
                 "n_trans": n, "fecha": str(fecha),
                 "producto": producto, "cantidad": int(cantidad)
             }])
-            st.session_state.df_ventas = pd.concat(
-                [st.session_state.df_ventas, nuevo], ignore_index=True
-            )
+            st.session_state.df_ventas = pd.concat([st.session_state.df_ventas, nuevo], ignore_index=True)
             guardar("ventas", st.session_state.df_ventas)
             st.success(f"Venta #{n} agregada.")
             st.rerun()
 
     st.markdown("---")
     st.subheader("📋 Editar registro de ventas")
-    st.caption("✏️ Edita celdas · 🗑️ Elimina filas con el ícono a la izquierda · ➕ Agrega al final")
+    st.caption("✏️ Edita celdas · 🗑️ Elimina filas · ➕ Agrega al final")
 
     df_v_edit = st.data_editor(
         st.session_state.df_ventas,
@@ -487,8 +480,7 @@ elif menu == "🛒 Ventas":
             "producto": st.column_config.SelectboxColumn(
                 "Producto",
                 options=st.session_state.df_productos["producto"].tolist(),
-                required=True,
-                width="medium",
+                required=True, width="medium",
             ),
             "cantidad": st.column_config.NumberColumn("Cantidad", min_value=1, step=1),
         },
@@ -520,7 +512,7 @@ elif menu == "🛒 Ventas":
 
 
 # ---------------------------------------------------------
-# PRODUCTOS
+# 📦 PRODUCTOS
 # ---------------------------------------------------------
 elif menu == "📦 Productos":
     st.title("📦 Catálogo de Productos")
@@ -555,7 +547,7 @@ elif menu == "📦 Productos":
 
 
 # ---------------------------------------------------------
-# COSTOS
+# 💰 COSTOS
 # ---------------------------------------------------------
 elif menu == "💰 Costos":
     st.title("💰 Estructura de Costos")
@@ -619,4 +611,196 @@ elif menu == "💰 Costos":
                 st.rerun()
         with c2:
             if st.button("↩️ Descartar", key="desc_bom", use_container_width=True):
-                st.r
+                st.rerun()
+        with c3:
+            total_bom = float(df_bom_edit["costo"].sum()) if not df_bom_edit.empty else 0.0
+            st.metric("Costo directo unit.", f"Bs {total_bom:,.2f}")
+
+        render_importador("bom", "BOM", "df_bom", modo="reemplazar")
+
+
+# ---------------------------------------------------------
+# 📈 PREDICCIÓN
+# ---------------------------------------------------------
+elif menu == "📈 Predicción":
+    st.title("📈 Predicción y Proyección de Ventas")
+    st.caption("Edita los meses históricos · Los proyectados se ajustan con regresión lineal")
+
+    df_pred_edit = st.data_editor(
+        st.session_state.df_prediccion,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editor_prediccion",
+        column_config={
+            "mes_num": st.column_config.NumberColumn("N°", width="small", step=1),
+            "mes": st.column_config.TextColumn("Mes", width="medium", required=True),
+            "tipo": st.column_config.SelectboxColumn(
+                "Tipo", options=["Histórico Real", "Proyección"],
+                required=True, width="medium",
+            ),
+            "unidades": st.column_config.NumberColumn("Unidades", min_value=0, step=10),
+            "precio_prom": st.column_config.NumberColumn("Precio prom. (Bs)", min_value=0.0, step=0.5, format="%.2f"),
+        },
+    )
+
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        if st.button("💾 Guardar cambios en predicción", use_container_width=True):
+            st.session_state.df_prediccion = df_pred_edit.reset_index(drop=True)
+            guardar("prediccion", st.session_state.df_prediccion)
+            st.success("Predicción actualizada.")
+            st.rerun()
+    with c2:
+        if st.button("↩️ Descartar", key="desc_pred", use_container_width=True):
+            st.rerun()
+
+    st.markdown("---")
+    st.subheader("📊 Proyección con tendencia lineal")
+    df_pred = predecir_ventas(st.session_state.df_prediccion)
+    if not df_pred.empty:
+        st.dataframe(df_pred, use_container_width=True, hide_index=True)
+
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=df_pred["mes"], y=df_pred["unidades_ajustadas"],
+                             name="Unidades", marker_color="#0077b6"))
+        fig.add_trace(go.Scatter(x=df_pred["mes"], y=df_pred["ingresos"],
+                                 name="Ingresos (Bs)", yaxis="y2",
+                                 line=dict(color="#f72585", width=3)))
+        fig.update_layout(
+            height=450, yaxis=dict(title="Unidades"),
+            yaxis2=dict(title="Bs", overlaying="y", side="right"),
+            legend=dict(orientation="h"),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No hay datos de predicción.")
+
+    render_importador("prediccion", "Predicción", "df_prediccion", modo="reemplazar")
+
+
+# ---------------------------------------------------------
+# ⚖️ PUNTO DE EQUILIBRIO
+# ---------------------------------------------------------
+elif menu == "⚖️ Punto de Equilibrio":
+    st.title("⚖️ Estado de Resultados y Punto de Equilibrio")
+
+    df_pred = predecir_ventas(st.session_state.df_prediccion)
+    cf = costos_fijos_totales(st.session_state.df_costos_fijos)
+    cvu = costo_variable_unitario(st.session_state.df_bom)
+
+    if df_pred.empty:
+        st.warning("Necesitas datos de predicción.")
+    else:
+        mes_sel = st.selectbox("Mes de análisis", df_pred["mes"].tolist(), index=len(df_pred) - 1)
+        fila = df_pred[df_pred["mes"] == mes_sel].iloc[0]
+        precio_prom = float(fila["precio_prom"])
+        unidades = int(fila["unidades_ajustadas"])
+        ingresos = float(fila["ingresos"])
+
+        er = estado_resultados(ingresos, unidades, cvu, cf)
+        pe = punto_equilibrio(precio_prom, cvu, cf)
+
+        st.subheader(f"Estado de Resultados – {mes_sel}")
+        df_er = pd.DataFrame([
+            {"Concepto": "Ingresos totales", "Monto (Bs)": er["ingresos"]},
+            {"Concepto": "(-) Costos variables", "Monto (Bs)": -er["costos_variables"]},
+            {"Concepto": "(=) Margen de contribución", "Monto (Bs)": er["margen_contribucion"]},
+            {"Concepto": "(-) Costos fijos", "Monto (Bs)": -er["costos_fijos"]},
+            {"Concepto": "(=) EBITDA", "Monto (Bs)": er["ebitda"]},
+        ])
+        st.dataframe(df_er.style.format({"Monto (Bs)": "Bs {:,.2f}"}),
+                     use_container_width=True, hide_index=True)
+
+        if er["ebitda"] < 0:
+            st.error(f"🚨 EBITDA negativo: Bs {er['ebitda']:,.2f}. El negocio no cubre costos este mes.")
+        else:
+            st.success(f"✅ EBITDA positivo: Bs {er['ebitda']:,.2f}")
+
+        st.subheader("⚖️ Punto de Equilibrio")
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Precio prom. copa", f"Bs {precio_prom:.2f}")
+        c2.metric("Costo variable unit.", f"Bs {cvu:.2f}")
+        c3.metric("Margen unitario", f"Bs {pe['margen_unit']:.2f}")
+        c4.metric("Costos fijos", f"Bs {cf:,.0f}")
+
+        c5, c6, c7, c8 = st.columns(4)
+        c5.metric("PE unidades", f"{pe['pe_unidades']:.0f} copas" if pe['pe_unidades'] != float('inf') else "∞")
+        c6.metric("PE ingresos", f"Bs {pe['pe_ingresos']:,.0f}" if pe['pe_ingresos'] != float('inf') else "∞")
+        c7.metric("Ventas proyectadas", f"{unidades} copas")
+        if unidades > 0 and pe['pe_unidades'] != float('inf'):
+            margen_seg = (unidades - pe["pe_unidades"]) / unidades * 100
+        else:
+            margen_seg = -100.0
+        c8.metric("Margen de seguridad", f"{margen_seg:.1f}%")
+
+        if pe['pe_unidades'] != float('inf') and unidades < pe["pe_unidades"]:
+            st.warning(
+                f"⚠️ Las ventas proyectadas ({unidades}) están **por debajo** del punto de equilibrio "
+                f"({pe['pe_unidades']:.0f}). Necesitas vender **{pe['pe_unidades']-unidades:.0f} copas más** al mes."
+            )
+        elif pe['pe_unidades'] != float('inf'):
+            st.success("✅ El negocio supera el punto de equilibrio.")
+        else:
+            st.error("⚠️ El margen de contribución es ≤ 0. Revisa precios o costos variables.")
+
+
+# ---------------------------------------------------------
+# 📝 ENCUESTAS
+# ---------------------------------------------------------
+elif menu == "📝 Encuestas":
+    st.title("📝 Encuestas a Clientes")
+    st.caption("Edita o elimina respuestas directamente en la tabla")
+
+    df_enc_edit = st.data_editor(
+        st.session_state.df_encuestas,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editor_encuestas",
+        column_config={
+            "pregunta": st.column_config.TextColumn("Pregunta", width="large", required=True),
+            "opcion": st.column_config.TextColumn("Opción de respuesta", width="medium", required=True),
+            "respuestas": st.column_config.NumberColumn("Respuestas", min_value=0, step=1),
+        },
+    )
+
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        if st.button("💾 Guardar cambios en encuestas", use_container_width=True):
+            st.session_state.df_encuestas = df_enc_edit.reset_index(drop=True)
+            guardar("encuestas", st.session_state.df_encuestas)
+            st.success("Encuestas actualizadas.")
+            st.rerun()
+    with c2:
+        if st.button("↩️ Descartar", key="desc_enc", use_container_width=True):
+            st.rerun()
+
+    st.markdown("---")
+    st.subheader("📊 Visualización por pregunta")
+
+    df_enc = st.session_state.df_encuestas
+    if not df_enc.empty:
+        preguntas = df_enc["pregunta"].dropna().unique().tolist()
+        for p in preguntas:
+            with st.expander(f"**{p}**", expanded=False):
+                sub = df_enc[df_enc["pregunta"] == p].copy()
+                total = sub["respuestas"].sum()
+                sub["porcentaje"] = sub["respuestas"] / total if total > 0 else 0
+                cc1, cc2 = st.columns([1, 1])
+                with cc1:
+                    st.dataframe(
+                        sub[["opcion", "respuestas", "porcentaje"]].style.format(
+                            {"porcentaje": "{:.1%}"}
+                        ),
+                        use_container_width=True, hide_index=True,
+                    )
+                with cc2:
+                    fig = px.bar(sub, x="respuestas", y="opcion", orientation="h",
+                                 text="respuestas", color="respuestas",
+                                 color_continuous_scale="Blues")
+                    fig.update_layout(height=250, showlegend=False,
+                                      margin=dict(l=0, r=0, t=10, b=0))
+                    st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No hay encuestas registradas. Importa un CSV o agrega filas en la tabla.")
+
+    render_importador("encuestas", "Encuestas", "df_encuestas", modo="reemplazar")
