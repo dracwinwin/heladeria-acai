@@ -1,0 +1,15 @@
+heladeria_acai/
+├── app.py                    # App principal Streamlit
+├── requirements.txt          # Dependencias
+├── data/                     # Carpeta para CSVs persistentes
+│   ├── ventas.csv
+│   ├── productos.csv
+│   ├── costos_fijos.csv
+│   ├── encuestas.csv
+│   └── prediccion.csv
+├── modules/
+│   ├── __init__.py
+│   ├── data_manager.py       # Carga/guarda CSVs
+│   ├── calculos.py           # Lógica financiera
+│   └── importador.py         # Importador CSV
+└── README.md
