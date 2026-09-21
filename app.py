@@ -1,7 +1,7 @@
 """
 🍧 Sistema Financiero - Heladería de Açaí Cobija
-App Streamlit TODO-EN-UNO. Datos persistidos en ./data/*.csv
-Ejecutar: streamlit run app.py
+App Streamlit todo-en-uno con edición inline, importación CSV/Excel,
+cálculos automáticos y persistencia local en ./data/*.csv
 """
 import os
 from datetime import date
@@ -37,8 +37,10 @@ def seed_productos():
         {"codigo": "B1", "producto": "Jugo Natural de Açaí", "categoria": "Bebidas", "precio": 12.0, "costo": 7.0},
     ])
 
+
 def seed_ventas():
     return pd.DataFrame(columns=["n_trans", "fecha", "producto", "cantidad"])
+
 
 def seed_costos_fijos():
     return pd.DataFrame([
@@ -52,6 +54,7 @@ def seed_costos_fijos():
         {"categoria": "Patente Municipal", "descripcion": "Impuestos", "monto": 200.0},
     ])
 
+
 def seed_bom():
     return pd.DataFrame([
         {"componente": "Base de Açaí", "detalle": "Pulpa congelada", "cantidad": "150 gr", "costo": 8.0},
@@ -61,61 +64,52 @@ def seed_bom():
         {"componente": "Insumos Secundarios", "detalle": "Servilletas y energía", "cantidad": "1 serv", "costo": 1.0},
     ])
 
+
 def seed_encuestas():
-    """Encuestas pre-cargadas del Excel original."""
     filas = [
-        # P1
         ("P1. ¿Con qué frecuencia compras en la heladería?", "Diario", 15),
         ("P1. ¿Con qué frecuencia compras en la heladería?", "2-3 veces por semana", 45),
         ("P1. ¿Con qué frecuencia compras en la heladería?", "Semanal", 25),
         ("P1. ¿Con qué frecuencia compras en la heladería?", "Ocasional", 15),
-        # P2
         ("P2. ¿Cuál es tu producto favorito de açaí?", "Açaí Mediano Tradicional", 42),
         ("P2. ¿Cuál es tu producto favorito de açaí?", "Açaí Especial Premium", 28),
         ("P2. ¿Cuál es tu producto favorito de açaí?", "Açaí Pequeño", 18),
         ("P2. ¿Cuál es tu producto favorito de açaí?", "Jugo de Açaí", 12),
-        # P3
         ("P3. ¿Qué tamaño prefieres habitualmente?", "Mediano (350ml)", 50),
         ("P3. ¿Qué tamaño prefieres habitualmente?", "Grande (500ml)", 25),
         ("P3. ¿Qué tamaño prefieres habitualmente?", "Pequeño (200ml)", 20),
         ("P3. ¿Qué tamaño prefieres habitualmente?", "Familiar / Especial", 5),
-        # P4
         ("P4. ¿Consideras adecuados los precios actuales?", "Muy adecuados", 35),
         ("P4. ¿Consideras adecuados los precios actuales?", "Adecuados", 52),
         ("P4. ¿Consideras adecuados los precios actuales?", "Elevados", 10),
         ("P4. ¿Consideras adecuados los precios actuales?", "Muy elevados", 3),
-        # P5
         ("P5. ¿Qué toppings prefieres agregar a tu açaí?", "Fruta fresca (Frutilla/Plátano)", 38),
         ("P5. ¿Qué toppings prefieres agregar a tu açaí?", "Granola y Cereales", 27),
         ("P5. ¿Qué toppings prefieres agregar a tu açaí?", "Leche condensada / en polvo", 23),
         ("P5. ¿Qué toppings prefieres agregar a tu açaí?", "Frutos secos / Chocolates", 12),
-        # P6
         ("P6. ¿Cuánto pagarías por un nuevo combo?", "Bs 15 - Bs 20", 25),
         ("P6. ¿Cuánto pagarías por un nuevo combo?", "Bs 20 - Bs 25", 48),
         ("P6. ¿Cuánto pagarías por un nuevo combo?", "Bs 25 - Bs 35", 22),
         ("P6. ¿Cuánto pagarías por un nuevo combo?", "Más de Bs 35", 5),
-        # P7
         ("P7. ¿En qué horario sueles comprar más?", "Tarde (14:00 - 18:00)", 45),
         ("P7. ¿En qué horario sueles comprar más?", "Noche (18:00 - 22:00)", 40),
         ("P7. ¿En qué horario sueles comprar más?", "Mañana (09:00 - 12:00)", 10),
         ("P7. ¿En qué horario sueles comprar más?", "Mediodía (12:00 - 14:00)", 5),
-        # P8
         ("P8. ¿Qué te motiva a elegir esta heladería?", "Calidad y sabor del açaí", 52),
         ("P8. ¿Qué te motiva a elegir esta heladería?", "Ubicación céntrica en Cobija", 20),
         ("P8. ¿Qué te motiva a elegir esta heladería?", "Atención al cliente", 18),
         ("P8. ¿Qué te motiva a elegir esta heladería?", "Precios competitivos", 10),
-        # P9
         ("P9. ¿Qué producto nuevo te gustaría?", "Açaí Batido Protein", 35),
         ("P9. ¿Qué producto nuevo te gustaría?", "Waffles con Açaí", 30),
         ("P9. ¿Qué producto nuevo te gustaría?", "Helado Keto Sin Azúcar", 20),
         ("P9. ¿Qué producto nuevo te gustaría?", "Smoothies Tropicales", 15),
-        # P10
         ("P10. ¿Recomendarías la heladería?", "Definitivamente sí", 78),
         ("P10. ¿Recomendarías la heladería?", "Probablemente sí", 18),
         ("P10. ¿Recomendarías la heladería?", "Tal vez", 3),
         ("P10. ¿Recomendarías la heladería?", "No", 1),
     ]
     return pd.DataFrame(filas, columns=["pregunta", "opcion", "respuestas"])
+
 
 def seed_prediccion():
     return pd.DataFrame([
@@ -134,6 +128,7 @@ def seed_prediccion():
 def _path(nombre):
     return os.path.join(DATA_DIR, f"{nombre}.csv")
 
+
 def cargar_o_crear(nombre, seed_fn):
     p = _path(nombre)
     if os.path.exists(p):
@@ -145,8 +140,13 @@ def cargar_o_crear(nombre, seed_fn):
     df.to_csv(p, index=False)
     return df
 
+
 def guardar(nombre, df):
-    df.to_csv(_path(nombre), index=False)
+    try:
+        df.to_csv(_path(nombre), index=False)
+    except Exception as e:
+        st.warning(f"No se pudo guardar {nombre}.csv: {e}")
+
 
 def init_state():
     if "df_productos" not in st.session_state:
@@ -162,6 +162,7 @@ def init_state():
     if "df_prediccion" not in st.session_state:
         st.session_state.df_prediccion = cargar_o_crear("prediccion", seed_prediccion)
 
+
 def persistir_todo():
     guardar("productos", st.session_state.df_productos)
     guardar("ventas", st.session_state.df_ventas)
@@ -169,6 +170,16 @@ def persistir_todo():
     guardar("bom", st.session_state.df_bom)
     guardar("encuestas", st.session_state.df_encuestas)
     guardar("prediccion", st.session_state.df_prediccion)
+
+
+def resetear_todo():
+    st.session_state.df_productos = seed_productos()
+    st.session_state.df_ventas = seed_ventas()
+    st.session_state.df_costos_fijos = seed_costos_fijos()
+    st.session_state.df_bom = seed_bom()
+    st.session_state.df_encuestas = seed_encuestas()
+    st.session_state.df_prediccion = seed_prediccion()
+    persistir_todo()
 
 
 # =========================================================
@@ -191,6 +202,7 @@ def enriquecer_ventas(df_ventas, df_productos):
                                 df["utilidad_bruta"] / df["venta_total"], 0)
     return df
 
+
 def resumen_ventas(df):
     if df.empty:
         return {"unidades": 0, "ingresos": 0.0, "costos": 0.0, "utilidad": 0.0, "margen": 0.0}
@@ -202,6 +214,7 @@ def resumen_ventas(df):
         "utilidad": float(df["utilidad_bruta"].sum()),
         "margen": float(df["utilidad_bruta"].sum() / ing) if ing > 0 else 0.0,
     }
+
 
 def ranking_productos(df_enr, df_prod):
     if df_enr.empty:
@@ -219,34 +232,42 @@ def ranking_productos(df_enr, df_prod):
     agg.insert(0, "ranking", agg.index + 1)
     return agg
 
+
 def predecir_ventas(df_pred):
     df = df_pred.copy()
-    historico = df[df["tipo"].str.contains("Histórico", case=False, na=False)]
+    if df.empty:
+        df["unidades_ajustadas"] = []
+        df["ingresos"] = []
+        return df
+    historico = df[df["tipo"].astype(str).str.contains("Histórico", case=False, na=False)]
     if len(historico) >= 2:
-        x = historico["mes_num"].values
-        y = historico["unidades"].values
+        x = historico["mes_num"].values.astype(float)
+        y = historico["unidades"].values.astype(float)
         coef = np.polyfit(x, y, 1)
         unidades_aj = []
         for _, row in df.iterrows():
-            if row["tipo"] and "Histórico" in str(row["tipo"]):
-                unidades_aj.append(row["unidades"])
+            if "Histórico" in str(row["tipo"]):
+                unidades_aj.append(float(row["unidades"]))
             else:
-                unidades_aj.append(max(0, coef[0] * row["mes_num"] + coef[1]))
+                unidades_aj.append(max(0.0, coef[0] * float(row["mes_num"]) + coef[1]))
         df["unidades_ajustadas"] = np.round(unidades_aj, 0)
     else:
         df["unidades_ajustadas"] = df["unidades"]
     df["ingresos"] = df["unidades_ajustadas"] * df["precio_prom"]
     return df
 
+
 def costo_variable_unitario(df_bom):
     if df_bom.empty:
         return 0.0
     return float(df_bom["costo"].sum())
 
+
 def costos_fijos_totales(df_cf):
     if df_cf.empty:
         return 0.0
     return float(df_cf["monto"].sum())
+
 
 def punto_equilibrio(precio_prom, cvu, cf):
     margen = precio_prom - cvu
@@ -254,6 +275,7 @@ def punto_equilibrio(precio_prom, cvu, cf):
         return {"margen_unit": margen, "pe_unidades": float("inf"), "pe_ingresos": float("inf")}
     pe_u = cf / margen
     return {"margen_unit": margen, "pe_unidades": pe_u, "pe_ingresos": pe_u * precio_prom}
+
 
 def estado_resultados(ingresos, unidades, cvu, cf):
     cv = unidades * cvu
@@ -286,6 +308,7 @@ EJEMPLOS = {
     "prediccion": "mes_num,mes,tipo,unidades,precio_prom\n1,Septiembre 2026,Histórico Real,450,19.5",
 }
 
+
 def leer_archivo(archivo):
     nombre = archivo.name.lower()
     if nombre.endswith(".csv"):
@@ -297,6 +320,7 @@ def leer_archivo(archivo):
     elif nombre.endswith((".xlsx", ".xls")):
         return pd.read_excel(archivo)
     raise ValueError("Formato no soportado. Usa CSV o Excel.")
+
 
 def render_importador(clave, etiqueta, estado_key, modo="reemplazar"):
     with st.expander(f"📥 Importar {etiqueta}", expanded=False):
@@ -319,12 +343,16 @@ def render_importador(clave, etiqueta, estado_key, modo="reemplazar"):
                 if modo == "reemplazar":
                     if st.button(f"♻️ Reemplazar {etiqueta}", key=f"rep_{clave}"):
                         st.session_state[estado_key] = df
+                        guardar(clave, df)
+                        st.success("Datos reemplazados.")
                         st.rerun()
                 else:
                     if st.button(f"➕ Agregar a {etiqueta}", key=f"agr_{clave}"):
                         st.session_state[estado_key] = pd.concat(
                             [st.session_state[estado_key], df], ignore_index=True
                         )
+                        guardar(clave, st.session_state[estado_key])
+                        st.success("Datos agregados.")
                         st.rerun()
             except Exception as e:
                 st.error(f"Error: {e}")
@@ -352,9 +380,14 @@ menu = st.sidebar.radio("Navegación", [
 st.sidebar.markdown("---")
 if st.sidebar.button("💾 Guardar todo en disco", use_container_width=True):
     persistir_todo()
-    st.sidebar.success("¡Datos guardados en ./data/!")
+    st.sidebar.success("¡Datos guardados!")
 
-st.sidebar.caption("v1.0 · Datos en memoria + CSV local")
+if st.sidebar.button("♻️ Restaurar datos de ejemplo", use_container_width=True):
+    resetear_todo()
+    st.sidebar.success("Datos restaurados.")
+    st.rerun()
+
+st.sidebar.caption("v1.1 · Datos en memoria + CSV local")
 
 
 # ---------------------------------------------------------
@@ -377,14 +410,16 @@ if menu == "📊 Dashboard":
 
     st.markdown("---")
     df_pred = predecir_ventas(st.session_state.df_prediccion)
-    precio_prom = float(df_pred["precio_prom"].iloc[-1]) if not df_pred.empty else 0
+    precio_prom = float(df_pred["precio_prom"].iloc[-1]) if not df_pred.empty else 0.0
     pe = punto_equilibrio(precio_prom, cvu, cf)
 
     c5, c6, c7, c8 = st.columns(4)
     c5.metric("🏠 Costos fijos/mes", f"Bs {cf:,.2f}")
     c6.metric("📦 Costo variable unit.", f"Bs {cvu:,.2f}")
-    c7.metric("⚖️ PE (unidades)", f"{pe['pe_unidades']:.0f} copas")
-    c8.metric("💰 PE (Bs)", f"Bs {pe['pe_ingresos']:,.0f}")
+    c7.metric("⚖️ PE (unidades)", f"{pe['pe_unidades']:.0f} copas"
+              if pe['pe_unidades'] != float('inf') else "∞")
+    c8.metric("💰 PE (Bs)", f"Bs {pe['pe_ingresos']:,.0f}"
+              if pe['pe_ingresos'] != float('inf') else "∞")
 
     st.markdown("---")
     col_a, col_b = st.columns(2)
@@ -433,24 +468,55 @@ elif menu == "🛒 Ventas":
             st.session_state.df_ventas = pd.concat(
                 [st.session_state.df_ventas, nuevo], ignore_index=True
             )
+            guardar("ventas", st.session_state.df_ventas)
             st.success(f"Venta #{n} agregada.")
             st.rerun()
 
-    render_importador("ventas", "Ventas", "df_ventas", modo="agregar")
+    st.markdown("---")
+    st.subheader("📋 Editar registro de ventas")
+    st.caption("✏️ Edita celdas · 🗑️ Elimina filas con el ícono a la izquierda · ➕ Agrega al final")
+
+    df_v_edit = st.data_editor(
+        st.session_state.df_ventas,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editor_ventas",
+        column_config={
+            "n_trans": st.column_config.NumberColumn("N°", width="small", step=1),
+            "fecha": st.column_config.TextColumn("Fecha (YYYY-MM-DD)", width="medium"),
+            "producto": st.column_config.SelectboxColumn(
+                "Producto",
+                options=st.session_state.df_productos["producto"].tolist(),
+                required=True,
+                width="medium",
+            ),
+            "cantidad": st.column_config.NumberColumn("Cantidad", min_value=1, step=1),
+        },
+    )
+
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        if st.button("💾 Guardar cambios en ventas", use_container_width=True):
+            st.session_state.df_ventas = df_v_edit.reset_index(drop=True)
+            guardar("ventas", st.session_state.df_ventas)
+            st.success("Ventas actualizadas.")
+            st.rerun()
+    with c2:
+        if st.button("↩️ Descartar", key="desc_ventas", use_container_width=True):
+            st.rerun()
 
     st.markdown("---")
-    st.subheader("📋 Registro completo")
+    st.subheader("📊 Vista con cálculos")
     df_enr = enriquecer_ventas(st.session_state.df_ventas, st.session_state.df_productos)
     if not df_enr.empty:
         st.dataframe(df_enr, use_container_width=True, hide_index=True)
         res = resumen_ventas(df_enr)
         st.info(f"**Totales:** {res['unidades']} unid · Bs {res['ingresos']:,.2f} "
                 f"ingresos · Bs {res['utilidad']:,.2f} utilidad · {res['margen']*100:.1f}% margen")
-        if st.button("🗑️ Borrar todas las ventas"):
-            st.session_state.df_ventas = st.session_state.df_ventas.iloc[0:0]
-            st.rerun()
     else:
-        st.info("Aún no hay ventas registradas.")
+        st.info("Sin ventas registradas.")
+
+    render_importador("ventas", "Ventas", "df_ventas", modo="agregar")
 
 
 # ---------------------------------------------------------
@@ -458,27 +524,32 @@ elif menu == "🛒 Ventas":
 # ---------------------------------------------------------
 elif menu == "📦 Productos":
     st.title("📦 Catálogo de Productos")
-    st.dataframe(st.session_state.df_productos, use_container_width=True, hide_index=True)
+    st.caption("✏️ Edita celdas · 🗑️ Elimina filas · ➕ Agrega al final")
 
-    with st.form("nuevo_producto", clear_on_submit=True):
-        c1, c2, c3, c4, c5 = st.columns(5)
-        codigo = c1.text_input("Código")
-        nombre = c2.text_input("Producto")
-        cat = c3.text_input("Categoría")
-        precio = c4.number_input("Precio (Bs)", min_value=0.0, step=0.5)
-        costo = c5.number_input("Costo (Bs)", min_value=0.0, step=0.5)
-        if st.form_submit_button("➕ Agregar"):
-            if nombre:
-                nuevo = pd.DataFrame([{
-                    "codigo": codigo, "producto": nombre, "categoria": cat,
-                    "precio": precio, "costo": costo
-                }])
-                st.session_state.df_productos = pd.concat(
-                    [st.session_state.df_productos, nuevo], ignore_index=True
-                )
-                st.rerun()
-            else:
-                st.error("El nombre es obligatorio.")
+    df_editado = st.data_editor(
+        st.session_state.df_productos,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editor_productos",
+        column_config={
+            "codigo": st.column_config.TextColumn("Código", width="small"),
+            "producto": st.column_config.TextColumn("Producto", width="medium", required=True),
+            "categoria": st.column_config.TextColumn("Categoría", width="medium"),
+            "precio": st.column_config.NumberColumn("Precio (Bs)", min_value=0.0, step=0.5, format="%.2f"),
+            "costo": st.column_config.NumberColumn("Costo (Bs)", min_value=0.0, step=0.5, format="%.2f"),
+        },
+    )
+
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        if st.button("💾 Guardar cambios en productos", use_container_width=True):
+            st.session_state.df_productos = df_editado.reset_index(drop=True)
+            guardar("productos", st.session_state.df_productos)
+            st.success("Productos actualizados.")
+            st.rerun()
+    with c2:
+        if st.button("↩️ Descartar", key="desc_prod", use_container_width=True):
+            st.rerun()
 
     render_importador("productos", "Productos", "df_productos", modo="reemplazar")
 
@@ -492,185 +563,60 @@ elif menu == "💰 Costos":
 
     with tab1:
         st.subheader("Costos fijos mensuales")
-        st.dataframe(st.session_state.df_costos_fijos, use_container_width=True, hide_index=True)
-        st.metric("Total costos fijos",
-                  f"Bs {costos_fijos_totales(st.session_state.df_costos_fijos):,.2f}")
+        st.caption("✏️ Edita montos · 🗑️ Elimina filas · ➕ Agrega al final")
 
-        with st.form("nuevo_cf", clear_on_submit=True):
-            c1, c2, c3 = st.columns([2, 3, 1])
-            cat = c1.text_input("Categoría")
-            desc = c2.text_input("Descripción")
-            monto = c3.number_input("Monto (Bs)", min_value=0.0, step=50.0)
-            if st.form_submit_button("➕ Agregar costo fijo"):
-                nuevo = pd.DataFrame([{"categoria": cat, "descripcion": desc, "monto": monto}])
-                st.session_state.df_costos_fijos = pd.concat(
-                    [st.session_state.df_costos_fijos, nuevo], ignore_index=True
-                )
+        df_cf_edit = st.data_editor(
+            st.session_state.df_costos_fijos,
+            num_rows="dynamic",
+            use_container_width=True,
+            key="editor_costos_fijos",
+            column_config={
+                "categoria": st.column_config.TextColumn("Categoría", width="medium", required=True),
+                "descripcion": st.column_config.TextColumn("Descripción", width="large"),
+                "monto": st.column_config.NumberColumn("Monto (Bs)", min_value=0.0, step=50.0, format="%.2f"),
+            },
+        )
+
+        c1, c2, c3 = st.columns([1, 1, 1])
+        with c1:
+            if st.button("💾 Guardar costos fijos", use_container_width=True):
+                st.session_state.df_costos_fijos = df_cf_edit.reset_index(drop=True)
+                guardar("costos_fijos", st.session_state.df_costos_fijos)
+                st.success("Guardado.")
                 st.rerun()
+        with c2:
+            if st.button("↩️ Descartar", key="desc_cf", use_container_width=True):
+                st.rerun()
+        with c3:
+            total = float(df_cf_edit["monto"].sum()) if not df_cf_edit.empty else 0.0
+            st.metric("Total", f"Bs {total:,.2f}")
 
         render_importador("costos_fijos", "Costos Fijos", "df_costos_fijos", modo="reemplazar")
 
     with tab2:
         st.subheader("BOM – Açaí Mediano 300ml")
-        st.dataframe(st.session_state.df_bom, use_container_width=True, hide_index=True)
-        st.metric("Costo directo unitario",
-                  f"Bs {costo_variable_unitario(st.session_state.df_bom):,.2f}")
+        st.caption("✏️ Edita componentes y costos · 🗑️ Elimina filas · ➕ Agrega al final")
 
-        with st.form("nuevo_bom", clear_on_submit=True):
-            c1, c2, c3, c4 = st.columns([2, 3, 2, 1])
-            comp = c1.text_input("Componente")
-            det = c2.text_input("Detalle")
-            cant = c3.text_input("Cantidad / unidad")
-            costo = c4.number_input("Costo (Bs)", min_value=0.0, step=0.5)
-            if st.form_submit_button("➕ Agregar componente"):
-                nuevo = pd.DataFrame([{
-                    "componente": comp, "detalle": det,
-                    "cantidad": cant, "costo": costo
-                }])
-                st.session_state.df_bom = pd.concat(
-                    [st.session_state.df_bom, nuevo], ignore_index=True
-                )
+        df_bom_edit = st.data_editor(
+            st.session_state.df_bom,
+            num_rows="dynamic",
+            use_container_width=True,
+            key="editor_bom",
+            column_config={
+                "componente": st.column_config.TextColumn("Componente", width="medium", required=True),
+                "detalle": st.column_config.TextColumn("Detalle", width="large"),
+                "cantidad": st.column_config.TextColumn("Cantidad/Unidad", width="small"),
+                "costo": st.column_config.NumberColumn("Costo (Bs)", min_value=0.0, step=0.5, format="%.2f"),
+            },
+        )
+
+        c1, c2, c3 = st.columns([1, 1, 1])
+        with c1:
+            if st.button("💾 Guardar BOM", use_container_width=True):
+                st.session_state.df_bom = df_bom_edit.reset_index(drop=True)
+                guardar("bom", st.session_state.df_bom)
+                st.success("Guardado.")
                 st.rerun()
-
-        render_importador("bom", "BOM", "df_bom", modo="reemplazar")
-
-
-# ---------------------------------------------------------
-# PREDICCIÓN
-# ---------------------------------------------------------
-elif menu == "📈 Predicción":
-    st.title("📈 Predicción y Proyección de Ventas")
-    st.caption("Ajuste lineal sobre meses históricos, aplicado a las proyecciones")
-
-    df_pred = predecir_ventas(st.session_state.df_prediccion)
-    st.dataframe(df_pred, use_container_width=True, hide_index=True)
-
-    fig = go.Figure()
-    fig.add_trace(go.Bar(x=df_pred["mes"], y=df_pred["unidades_ajustadas"],
-                         name="Unidades", marker_color="#0077b6"))
-    fig.add_trace(go.Scatter(x=df_pred["mes"], y=df_pred["ingresos"],
-                             name="Ingresos (Bs)", yaxis="y2",
-                             line=dict(color="#f72585", width=3)))
-    fig.update_layout(
-        height=450, yaxis=dict(title="Unidades"),
-        yaxis2=dict(title="Bs", overlaying="y", side="right"),
-        legend=dict(orientation="h"),
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-    render_importador("prediccion", "Predicción", "df_prediccion", modo="reemplazar")
-
-
-# ---------------------------------------------------------
-# PUNTO DE EQUILIBRIO
-# ---------------------------------------------------------
-elif menu == "⚖️ Punto de Equilibrio":
-    st.title("⚖️ Estado de Resultados y Punto de Equilibrio")
-
-    df_pred = predecir_ventas(st.session_state.df_prediccion)
-    cf = costos_fijos_totales(st.session_state.df_costos_fijos)
-    cvu = costo_variable_unitario(st.session_state.df_bom)
-
-    if df_pred.empty:
-        st.warning("Necesitas datos de predicción.")
-    else:
-        mes_sel = st.selectbox("Mes de análisis", df_pred["mes"].tolist(),
-                               index=len(df_pred) - 1)
-        fila = df_pred[df_pred["mes"] == mes_sel].iloc[0]
-        precio_prom = float(fila["precio_prom"])
-        unidades = int(fila["unidades_ajustadas"])
-        ingresos = float(fila["ingresos"])
-
-        er = estado_resultados(ingresos, unidades, cvu, cf)
-        pe = punto_equilibrio(precio_prom, cvu, cf)
-
-        st.subheader(f"Estado de Resultados – {mes_sel}")
-        df_er = pd.DataFrame([
-            {"Concepto": "Ingresos totales", "Monto (Bs)": er["ingresos"]},
-            {"Concepto": "(-) Costos variables", "Monto (Bs)": -er["costos_variables"]},
-            {"Concepto": "(=) Margen de contribución", "Monto (Bs)": er["margen_contribucion"]},
-            {"Concepto": "(-) Costos fijos", "Monto (Bs)": -er["costos_fijos"]},
-            {"Concepto": "(=) EBITDA", "Monto (Bs)": er["ebitda"]},
-        ])
-        st.dataframe(df_er.style.format({"Monto (Bs)": "Bs {:,.2f}"}),
-                     use_container_width=True, hide_index=True)
-
-        if er["ebitda"] < 0:
-            st.error(f"🚨 EBITDA negativo: Bs {er['ebitda']:,.2f}. El negocio no cubre costos en este mes.")
-        else:
-            st.success(f"✅ EBITDA positivo: Bs {er['ebitda']:,.2f}")
-
-        st.subheader("⚖️ Punto de Equilibrio")
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Precio prom. copa", f"Bs {precio_prom:.2f}")
-        c2.metric("Costo variable unit.", f"Bs {cvu:.2f}")
-        c3.metric("Margen unitario", f"Bs {pe['margen_unit']:.2f}")
-        c4.metric("Costos fijos", f"Bs {cf:,.0f}")
-
-        c5, c6, c7, c8 = st.columns(4)
-        c5.metric("PE unidades", f"{pe['pe_unidades']:.0f} copas")
-        c6.metric("PE ingresos", f"Bs {pe['pe_ingresos']:,.0f}")
-        c7.metric("Ventas proyectadas", f"{unidades} copas")
-        margen_seg = (unidades - pe["pe_unidades"]) / unidades * 100 if unidades > 0 else -100
-        c8.metric("Margen de seguridad", f"{margen_seg:.1f}%")
-
-        if unidades < pe["pe_unidades"]:
-            st.warning(
-                f"⚠️ Las ventas proyectadas ({unidades}) están **por debajo** "
-                f"del punto de equilibrio ({pe['pe_unidades']:.0f}). "
-                f"Necesitas vender **{pe['pe_unidades']-unidades:.0f} copas más** al mes."
-            )
-        else:
-            st.success("✅ El negocio supera el punto de equilibrio.")
-
-
-# ---------------------------------------------------------
-# ENCUESTAS
-# ---------------------------------------------------------
-elif menu == "📝 Encuestas":
-    st.title("📝 Encuestas a Clientes")
-    st.caption("Resultados consolidados · 100 respuestas por pregunta")
-
-    df_enc = st.session_state.df_encuestas
-    if df_enc.empty:
-        st.info("No hay encuestas. Importa un CSV o agrega manualmente.")
-    else:
-        preguntas = df_enc["pregunta"].unique().tolist()
-        for p in preguntas:
-            with st.expander(f"**{p}**", expanded=False):
-                sub = df_enc[df_enc["pregunta"] == p].copy()
-                total = sub["respuestas"].sum()
-                sub["porcentaje"] = sub["respuestas"] / total if total > 0 else 0
-                c1, c2 = st.columns([1, 1])
-                with c1:
-                    st.dataframe(
-                        sub[["opcion", "respuestas", "porcentaje"]].style.format(
-                            {"porcentaje": "{:.1%}"}
-                        ),
-                        use_container_width=True, hide_index=True,
-                    )
-                with c2:
-                    fig = px.bar(sub, x="respuestas", y="opcion", orientation="h",
-                                 text="respuestas", color="respuestas",
-                                 color_continuous_scale="Blues")
-                    fig.update_layout(height=250, showlegend=False,
-                                      margin=dict(l=0, r=0, t=10, b=0))
-                    st.plotly_chart(fig, use_container_width=True)
-
-        # Formulario manual
-        with st.form("nueva_encuesta", clear_on_submit=True):
-            st.write("**Agregar respuesta manualmente**")
-            c1, c2, c3 = st.columns([3, 2, 1])
-            preg = c1.text_input("Pregunta")
-            opcion = c2.text_input("Opción de respuesta")
-            cant = c3.number_input("Respuestas", min_value=0, value=1, step=1)
-            if st.form_submit_button("➕ Agregar"):
-                nuevo = pd.DataFrame([{
-                    "pregunta": preg, "opcion": opcion, "respuestas": int(cant)
-                }])
-                st.session_state.df_encuestas = pd.concat(
-                    [st.session_state.df_encuestas, nuevo], ignore_index=True
-                )
-                st.rerun()
-
-    render_importador("encuestas", "Encuestas", "df_encuestas", modo="reemplazar")
+        with c2:
+            if st.button("↩️ Descartar", key="desc_bom", use_container_width=True):
+                st.r
